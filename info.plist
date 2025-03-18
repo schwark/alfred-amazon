@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>bundleid</key>
+    <string>com.schwark.alfred.amazon</string>
+    <key>category</key>
+    <string>Internet</string>
+    <key>connections</key>
+    <dict>
+        <key>D543F4B5-9C8B-4B71-A0C3-6B198F01B3BB</key>
+        <array>
+            <dict>
+                <key>destinationuid</key>
+                <string>A3D81E2D-6B7F-4075-B9A9-E8C4F1B91D87</string>
+                <key>modifiers</key>
+                <integer>0</integer>
+                <key>modifiersubtext</key>
+                <string></string>
+                <key>vitoclose</key>
+                <false/>
+            </dict>
+        </array>
+    </dict>
+    <key>createdby</key>
+    <string>Schwark Satyavolu</string>
+    <key>description</key>
+    <string>Search Amazon with affiliate tag</string>
+    <key>disabled</key>
+    <false/>
+    <key>name</key>
+    <string>Amazon Search</string>
+    <key>objects</key>
+    <array>
+        <dict>
+            <key>config</key>
+            <dict>
+                <key>argumenttype</key>
+                <integer>0</integer>
+                <key>escaping</key>
+                <integer>102</integer>
+                <key>keyword</key>
+                <string>az</string>
+                <key>queuedelaycustom</key>
+                <integer>3</integer>
+                <key>queuedelayimmediatelyinitially</key>
+                <true/>
+                <key>queuedelaymode</key>
+                <integer>0</integer>
+                <key>queuemode</key>
+                <integer>1</integer>
+                <key>runningsubtext</key>
+                <string>Searching Amazon...</string>
+                <key>script</key>
+                <string>/usr/bin/python3 filter.py "{query}"</string>
+                <key>scriptargtype</key>
+                <integer>0</integer>
+                <key>scriptfile</key>
+                <string></string>
+                <key>subtext</key>
+                <string>Search Amazon with affiliate tag</string>
+                <key>title</key>
+                <string>Search Amazon</string>
+                <key>type</key>
+                <integer>0</integer>
+                <key>withspace</key>
+                <true/>
+            </dict>
+            <key>type</key>
+            <string>alfred.workflow.input.scriptfilter</string>
+            <key>uid</key>
+            <string>D543F4B5-9C8B-4B71-A0C3-6B198F01B3BB</string>
+            <key>version</key>
+            <integer>3</integer>
+        </dict>
+        <dict>
+            <key>config</key>
+            <dict>
+                <key>escaping</key>
+                <integer>102</integer>
+                <key>script</key>
+                <string>/usr/bin/python3 command.py "{query}"</string>
+                <key>type</key>
+                <integer>0</integer>
+            </dict>
+            <key>type</key>
+            <string>alfred.workflow.action.script</string>
+            <key>uid</key>
+            <string>A3D81E2D-6B7F-4075-B9A9-E8C4F1B91D87</string>
+            <key>version</key>
+            <integer>2</integer>
+        </dict>
+    </array>
+    <key>readme</key>
+    <string>Amazon Search Workflow
+
+This workflow allows you to quickly search Amazon products with an affiliate tag.
+
+Usage:
+1. Type 'az' followed by your search query
+2. Press Enter to open the search results in your default browser
+
+The search will automatically include the affiliate tag in the URL.</string>
+    <key>uidata</key>
+    <dict>
+        <key>A3D81E2D-6B7F-4075-B9A9-E8C4F1B91D87</key>
+        <dict>
+            <key>xpos</key>
+            <integer>300</integer>
+            <key>ypos</key>
+            <integer>50</integer>
+        </dict>
+        <key>D543F4B5-9C8B-4B71-A0C3-6B198F01B3BB</key>
+        <dict>
+            <key>xpos</key>
+            <integer>50</integer>
+            <key>ypos</key>
+            <integer>50</integer>
+        </dict>
+    </dict>
+    <key>version</key>
+    <string>1.0.0</string>
+    <key>webaddress</key>
+    <string>https://github.com/schwark/alfred-amazon</string>
+</dict>
+</plist> 

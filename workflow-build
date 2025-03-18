@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Get version from version file
+VERSION=$(cat version)
+NAME="Amazon-Search"
+
+# Create a temporary directory for the build
+rm -rf build
+mkdir build
+
+# Copy necessary files
+cp -r *.py *.plist *.png requirements.txt workflow *.html build/
+
+# Install dependencies in the build directory
+cd build
+pip3 install -r requirements.txt --target .
+
+# Remove unnecessary files
+find . -name "*.pyc" -delete
+find . -name "__pycache__" -delete
+find . -name "*.dist-info" -exec rm -rf {} +
+find . -name "*.egg-info" -exec rm -rf {} +
+
+# Create the workflow file
+cd ..
+rm -f "../$NAME-$VERSION.alfredworkflow"
+cd build
+zip -r "../$NAME-$VERSION.alfredworkflow" *
+cd ..
+
+# Clean up
+rm -rf build 
