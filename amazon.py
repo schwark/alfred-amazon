@@ -65,8 +65,15 @@ def parse_delivery_date(date_str):
 
 def normalize_amazon_url(url, asin=None):
     """Normalize Amazon URL to use dp format with associate tag."""
+    # If no ASIN provided, try to extract it from the URL
+    if not asin:
+        # Look for ASIN in dp format
+        asin_match = re.search(r'/dp/([A-Z0-9]{10})(?:/|\?|$)', url)
+        if asin_match:
+            asin = asin_match.group(1)
+    
     if asin:
-        # If we have an ASIN, use the dp format
+        # If we have an ASIN (either provided or extracted), use the dp format
         return f"https://www.amazon.com/dp/{asin}?tag={AMAZON_ASSOCIATE_TAG}"
     else:
         # Handle regular URLs
