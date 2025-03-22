@@ -21,17 +21,23 @@ A powerful Alfred workflow for searching Amazon products with smart filtering an
 ## Usage
 
 1. Type `az` followed by your search query
-2. Optional parameters:
-   - `srt:r` - Sort by rating (highest first)
-     - Calculates score as rating × number of reviews
-     - Example: 4.5 stars with 1000 reviews = 4500 points
-   - `srt:ra` - Sort by rating (lowest first)
-   - `srt:p` - Sort by price (lowest first)
-   - `srt:pd` - Sort by price (highest first)
-   - `dl:0` - Show only items available for delivery today
-   - `dl:1` - Show items available for delivery today or tomorrow
-   - `dl:2` - Show items available for delivery in 2 days or less
-   - etc.
+2. Press Enter to open the search results in your default browser
+3. Press Shift on any result to preview the item in a popup window
+   - In the preview window, press Enter to open the item in your browser
+   - Press Shift again to close the preview
+
+### Optional Parameters
+
+- `srt:r` - Sort by rating (highest first)
+  - Calculates score as rating × number of reviews
+  - Example: 4.5 stars with 1000 reviews = 4500 points
+- `srt:ra` - Sort by rating (lowest first)
+- `srt:p` - Sort by price (lowest first)
+- `srt:pd` - Sort by price (highest first)
+- `dl:0` - Show only items available for delivery today
+- `dl:1` - Show items available for delivery today or tomorrow
+- `dl:2` - Show items available for delivery in 2 days or less
+- etc.
 
 ### Examples
 
