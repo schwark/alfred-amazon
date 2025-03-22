@@ -106,8 +106,17 @@ def shorten_title(title):
         'brand': '',
         'core': '',
         'color': '',
-        'quantity': ''
+        'quantity': '',
+        'capacity': ''  # New part for memory/disk capacity
     }
+    
+    # Extract capacity information (e.g., "256GB", "1TB", "16GB", "2TB")
+    capacity_pattern = r'(\d+(?:\.\d+)?)\s*(?:GB|TB|MB)'
+    capacity_match = re.search(capacity_pattern, title, re.IGNORECASE)
+    if capacity_match:
+        parts['capacity'] = capacity_match.group(0)
+        # Remove the capacity from the title to avoid duplication
+        title = re.sub(capacity_pattern, '', title)
     
     # Extract quantity if present (e.g., "Pack of 2", "2-Pack", "Set of 3")
     quantity_patterns = [
@@ -161,6 +170,8 @@ def shorten_title(title):
         # Limit core description to first 5 words
         core_words = parts['core'].split()[:5]
         final_parts.append(' '.join(core_words))
+    if parts['capacity']:
+        final_parts.append(parts['capacity'])
     if parts['color']:
         final_parts.append(parts['color'])
     if parts['quantity']:
