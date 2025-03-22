@@ -42,15 +42,9 @@ Each result shows:
 - Delivery information (with 📦 emoji)
 - Sponsored status (with 📢 emoji) if applicable
 
-## Requirements
-
-- Alfred 4 or later
-- Python 3.9 or later
-- BeautifulSoup4
-
 ## Installation
 
-1. Download the latest release
+1. Download the [latest release](https://github.com/schwark/alfred-amazon/releases/latest/)
 2. Double-click the workflow file to install in Alfred
 3. The workflow will be ready to use
 
