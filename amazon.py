@@ -284,10 +284,42 @@ def get_search_results(wf, query):
                 if delivery_recipe:
                     delivery_text = ' '.join(delivery_recipe.stripped_strings)
                     # Try to find fastest delivery date
-                    date_match = re.search(r'(?:fastest|FREE) delivery ([A-Za-z]+,?\s+[A-Za-z]+\s+\d+)', delivery_text)
-                    if date_match:
-                        delivery_date = date_match.group(1)
-                        delivery = parse_delivery_date(delivery_date)
+                    date_patterns = [
+                        r'(?:fastest|FREE) delivery ([A-Za-z]+,?\s+[A-Za-z]+\s+\d+)',
+                        r'Get it by ([A-Za-z]+,?\s+[A-Za-z]+\s+\d+)',
+                        r'Arrives by ([A-Za-z]+,?\s+[A-Za-z]+\s+\d+)',
+                        r'Delivery ([A-Za-z]+,?\s+[A-Za-z]+\s+\d+)'
+                    ]
+                    
+                    earliest_date = None
+                    earliest_days = float('inf')
+                    
+                    # First check for immediate delivery options
+                    if 'FREE delivery tomorrow' in delivery_text:
+                        delivery = "Delivery tomorrow"
+                    elif 'FREE delivery today' in delivery_text:
+                        delivery = "Delivery today"
+                    else:
+                        # Check all date patterns
+                        for pattern in date_patterns:
+                            date_matches = re.finditer(pattern, delivery_text)
+                            for match in date_matches:
+                                delivery_date = match.group(1)
+                                parsed_date = parse_delivery_date(delivery_date)
+                                # Extract number of days from the parsed date
+                                if parsed_date.startswith('Delivery in '):
+                                    days = int(parsed_date.split()[2])
+                                    if days < earliest_days:
+                                        earliest_days = days
+                                        earliest_date = parsed_date
+                                elif parsed_date in ['Delivery today', 'Delivery tomorrow']:
+                                    days = 0 if parsed_date == 'Delivery today' else 1
+                                    if days < earliest_days:
+                                        earliest_days = days
+                                        earliest_date = parsed_date
+                        
+                        if earliest_date:
+                            delivery = earliest_date
                 
                 # Extract rating
                 rating_elem = product.find('span', {'class': 'a-icon-alt'})

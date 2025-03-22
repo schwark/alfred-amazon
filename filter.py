@@ -80,8 +80,7 @@ def main(wf):
             cache_key = f'search_{search_query}'
             
             # Try to get results from cache
-            # results = wf.cached_data(cache_key, lambda: amazon.get_search_results(wf, search_query), max_age=CACHE_AGE)
-            results = amazon.get_search_results(wf, search_query)
+            results = wf.cached_data(cache_key, lambda: amazon.get_search_results(wf, search_query), max_age=CACHE_AGE)
             
             if not results:
                 wf.add_item('No results found',
