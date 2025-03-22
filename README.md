@@ -17,7 +17,7 @@ A simple Alfred workflow to search Amazon products directly from Alfred.
 
 ## Usage
 
-1. Type `amazon` followed by your search query
+1. Type `az` followed by your search query
 2. Press Enter to open the selected product in your browser
 
 ## Example Results
