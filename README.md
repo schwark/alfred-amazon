@@ -1,59 +1,64 @@
 # Alfred Amazon Search
 
-A simple Alfred workflow to search Amazon products directly from Alfred.
+A powerful Alfred workflow for searching Amazon products with smart filtering and sorting capabilities.
 
 ## Features
 
-- 🔍 Quick Amazon product search
-- 🏷️ Shows product prices with support for:
-  - Regular prices
-  - Coupon discounts (both percentage and absolute dollar amounts)
-  - Effective price calculation when coupons are applied
-- 📢 Indicates sponsored items
-- ⭐ Displays product ratings and review counts
-- 📦 Shows delivery information
-- 🖼️ Product images as icons
-- 🔗 Amazon affiliate links (using tag: dillz-20)
-- 🔄 Sort results by rating or price
+- 🔍 Fast Amazon product search
+- 💰 Price and coupon display
+- ⭐ Rating and review count display
+- 📦 Delivery time information
+- 🖼️ Product images in results
+- 🔄 Smart caching for faster results
+- 📊 Sort results by rating or price
+- 🚚 Filter results by delivery time
+- 🔗 Amazon affiliate links support
 
 ## Usage
 
-1. Type `az` followed by your search query
-2. Optionally add `srt:` followed by:
-   - `r` to sort by rating (default: descending by rating × reviews)
-   - `p` to sort by price (default: ascending)
-   - Add `a` after `r` or `p` for ascending order
-   - Add `d` after `r` or `p` for descending order
-3. Press Enter to open the selected product in your browser
+1. Type `amazon` followed by your search query
+2. Optional parameters:
+   - `srt:r` - Sort by rating (highest first)
+   - `srt:ra` - Sort by rating (lowest first)
+   - `srt:p` - Sort by price (lowest first)
+   - `srt:pd` - Sort by price (highest first)
+   - `dl:0` - Show only items available for delivery today
+   - `dl:1` - Show items available for delivery today or tomorrow
+   - `dl:2` - Show items available for delivery in 2 days or less
+   - etc.
 
-Examples:
-- `az macbook srt:r` - Sort by rating (descending)
-- `az macbook srt:ra` - Sort by rating (ascending)
-- `az macbook srt:p` - Sort by price (ascending)
-- `az macbook srt:pd` - Sort by price (descending)
+### Examples
 
-## Example Results
+- `amazon laptop` - Basic search
+- `amazon headphones srt:r` - Search headphones, sorted by rating
+- `amazon monitor srt:p` - Search monitors, sorted by price (lowest first)
+- `amazon keyboard dl:1` - Search keyboards available for delivery tomorrow or less
+- `amazon mouse dl:0 srt:p` - Search mice available for delivery today, sorted by price
+- `amazon tablet srt:r dl:2` - Search tablets available in 2 days or less, sorted by rating
 
-Each result shows:
-- Product title (intelligently shortened)
-- Price (with 💰 emoji)
-  - If a coupon is available, shows the effective price with 🏷️ emoji
-- Rating and review count (with ⭐ emoji)
-- Delivery information (with 📦 emoji)
-- Sponsored status (with 📢 emoji) if applicable
+### Smart Caching
+
+The workflow uses intelligent caching to improve performance:
+- Search results are cached for 30 minutes
+- The cache is based on the base search term (without modifiers)
+- Modifiers (`srt:` and `dl:`) are applied to cached results
+- This means changing sort or delivery filters is instant
+- Product images are cached for 1 week
 
 ## Installation
 
-1. Download the [latest release](https://github.com/schwark/alfred-amazon/releases/latest/)
+1. Download the [latest release](https://github.com/schwark/alfred-amazon/releases/latest)
 2. Double-click the workflow file to install in Alfred
 3. The workflow will be ready to use
 
-## Development
+## Notes
 
-The workflow consists of two main Python files:
-- `filter.py`: Main workflow script that handles user input and displays results
-- `amazon.py`: Amazon-specific functionality for searching and parsing results
+- Results are cached for 30 minutes to improve performance
+- Product images are cached for 1 week
+- Delivery times are based on Amazon's estimates
+- Prices include applicable discounts and coupons
+- Affiliate links are used to support development
 
 ## License
 
-MIT License - feel free to use and modify as needed.
+MIT License - see LICENSE file for details

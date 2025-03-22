@@ -4,7 +4,7 @@
 """Amazon Search
 
 Usage:
-    amazon.py <query> [srt:<sort>]
+    amazon.py <query> [srt:<sort>] [dl:<days>]
 """
 
 import sys
@@ -14,35 +14,57 @@ import amazon
 
 CACHE_AGE = 1800  # 30 minutes
 
-def parse_sort_param(query):
-    """Parse sort parameter from query string."""
-    if 'srt:' not in query:
-        return query, None, None
+def parse_delivery_days(delivery_str):
+    """Convert delivery string to number of days."""
+    if not delivery_str:
+        return None
         
-    # Split query and sort parameter
-    parts = query.split('srt:', 1)
-    search_query = parts[0].strip()
-    sort_param = parts[1].strip().lower()
+    if delivery_str == "Delivery today":
+        return 0
+    elif delivery_str == "Delivery tomorrow":
+        return 1
+    elif delivery_str.startswith("Delivery in "):
+        try:
+            return int(delivery_str.split()[2])
+        except (ValueError, IndexError):
+            return None
+    return None
+
+def parse_query_params(query):
+    """Parse query string for sort and delivery parameters."""
+    search_query = query
+    sort_key = None
+    sort_reverse = None
+    max_delivery_days = None
     
     # Parse sort parameter
-    if not sort_param:
-        return search_query, None, None
+    if 'srt:' in query:
+        parts = query.split('srt:', 1)
+        search_query = parts[0].strip()
+        sort_param = parts[1].strip().lower()
         
-    # Get first character (r or p)
-    key = sort_param[0]
-    if key not in ('r', 'p'):
-        return search_query, None, None
-        
-    # Get direction if present
-    direction = sort_param[1] if len(sort_param) > 1 else None
-    if direction and direction not in ('a', 'd'):
-        direction = None
-        
-    # Set defaults if direction not specified
-    if not direction:
-        direction = 'd' if key == 'r' else 'a'
-        
-    return search_query, ('rating' if key == 'r' else 'price'), (direction == 'd')
+        if sort_param:
+            key = sort_param[0]
+            if key in ('r', 'p'):
+                direction = sort_param[1] if len(sort_param) > 1 else None
+                if not direction or direction in ('a', 'd'):
+                    if not direction:
+                        direction = 'd' if key == 'r' else 'a'
+                    sort_key = 'rating' if key == 'r' else 'price'
+                    sort_reverse = (direction == 'd')
+    
+    # Parse delivery parameter
+    if 'dl:' in search_query:
+        parts = search_query.split('dl:', 1)
+        search_query = parts[0].strip()
+        try:
+            max_delivery_days = int(parts[1].strip())
+            if max_delivery_days < 0:
+                max_delivery_days = None
+        except ValueError:
+            pass
+    
+    return search_query, sort_key, sort_reverse, max_delivery_days
 
 def download_image(url, asin):
     """Download an image from URL and save it to a temporary file using ASIN as filename."""
@@ -73,10 +95,10 @@ def main(wf):
                    icon='icon.png')
     else:
         try:
-            # Parse query and sort parameter
-            search_query, sort_key, sort_reverse = parse_sort_param(query)
+            # Parse query parameters
+            search_query, sort_key, sort_reverse, max_delivery_days = parse_query_params(query)
             
-            # Create cache key from query
+            # Create cache key from base search query (without modifiers)
             cache_key = f'search_{search_query}'
             
             # Try to get results from cache
@@ -86,6 +108,21 @@ def main(wf):
                 wf.add_item('No results found',
                            'Try a different search term',
                            icon=ICON_WEB)
+            
+            # Filter results by delivery time if specified
+            if max_delivery_days is not None:
+                filtered_results = []
+                for item in results:
+                    delivery_days = parse_delivery_days(item.get('delivery'))
+                    if delivery_days is not None and delivery_days <= max_delivery_days:
+                        filtered_results.append(item)
+                results = filtered_results
+                
+                # Show message if no items match the delivery filter
+                if not results:
+                    wf.add_item('No matching items found',
+                               f'No items available for delivery in {max_delivery_days} days or less',
+                               icon=ICON_WEB)
             
             # Sort results if sort parameter was provided
             if sort_key:
