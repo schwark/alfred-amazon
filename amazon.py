@@ -5,7 +5,11 @@ import re
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 from datetime import datetime
-from workflow import web
+from workflow import web, Workflow
+
+# Initialize workflow and logger
+wf = Workflow()
+log = wf.logger
 
 # Amazon-specific constants
 AMAZON_ASSOCIATE_TAG = 'dillz-20'
@@ -19,7 +23,7 @@ HEADERS = {
     'Upgrade-Insecure-Requests': '1',
     'Cache-Control': 'max-age=0'
 }
-MAX_RESULTS = 10
+MAX_RESULTS = 30
 
 def parse_delivery_date(date_str):
     """Convert delivery date to number of days from today."""
@@ -117,7 +121,7 @@ def shorten_title(title):
         match = re.search(pattern, title.lower())
         if match:
             parts['quantity'] = f"({match.group(1)}pk)"
-            title = re.sub(pattern, '', title, flags=re.IGNORECASE)
+            title = re.sub(pattern, '', title)
             break
     
     # Extract color if present
@@ -125,7 +129,7 @@ def shorten_title(title):
     color_match = re.search(color_pattern, title.lower())
     if color_match:
         parts['color'] = color_match.group(1).title()
-        title = re.sub(color_pattern, '', title, flags=re.IGNORECASE)
+        title = re.sub(color_pattern, '', title)
     
     # Split remaining title into words
     words = title.split()
@@ -215,10 +219,16 @@ def get_search_results(wf, query):
                 if title:
                     # Remove extra whitespace and newlines
                     title = ' '.join(title.split())
-                    # Remove sponsored tag if present
-                    title = re.sub(r'\s*\[Sponsored\]\s*', '', title, flags=re.IGNORECASE)
+                    # Check if item is sponsored (with or without brackets)
+                    is_sponsored = bool(re.search(r'(?:\[)?Sponsored(?:\])?', title))
+                    # Remove sponsored tag if present (with or without brackets)
+                    title = re.sub(r'\s*(?:\[)?Sponsored(?:\])?\s*', '', title)
+                    # Remove ad relevance text
+                    title = re.sub(r"You\u2019re seeing this ad based on the product\u2019s relevance to your search query.", '', title)
+                    # Remove leave ad feedback text
+                    title = re.sub(r'Leave ad feedback', '', title)
                     # Remove any other common tags
-                    title = re.sub(r'\s*\[(New|Limited Time|Sale|Deal|Prime)\]\s*', '', title, flags=re.IGNORECASE)
+                    title = re.sub(r'\s*\[(New|Limited Time|Sale|Deal|Prime)\]\s*', '', title)
                 
                 # Clean up title and URL
                 title = title.strip()
@@ -245,8 +255,17 @@ def get_search_results(wf, query):
                     continue
                 
                 # Extract coupon if present
+                coupon = None
                 coupon_elem = product.find('span', {'class': 's-coupon-unclipped'})
-                coupon = coupon_elem.get_text().strip() if coupon_elem else None
+                if coupon_elem:
+                    coupon_text = coupon_elem.get_text().strip()
+                    # Clean up coupon text
+                    coupon_text = re.sub(r'\s+', ' ', coupon_text)  # Normalize whitespace
+                    coupon_text = re.sub(r'^Save\s+', '', coupon_text)  # Remove "Save" prefix
+                    coupon_text = re.sub(r'^Get\s+', '', coupon_text)  # Remove "Get" prefix
+                    coupon_text = coupon_text.strip()
+                    if coupon_text:
+                        coupon = coupon_text
                 
                 # Extract delivery info
                 delivery = None
@@ -308,7 +327,8 @@ def get_search_results(wf, query):
                     'stars': rating,
                     'reviews': review_count,
                     'image_url': image_url,
-                    'asin': asin
+                    'asin': asin,
+                    'sponsored': is_sponsored
                 }
                 
                 # Only add items that have at least a title and URL

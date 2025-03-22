@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 *.alfredworkflow
 .DS_Store
+*.html

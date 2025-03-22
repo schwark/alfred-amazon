@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+"""Amazon Search
+
+Usage:
+    amazon.py <query>
+"""
+
 import sys
-import argparse
 import os
-import re
 from workflow import Workflow, ICON_WEB, web
 import amazon
 
@@ -30,21 +34,21 @@ def download_image(url, asin):
         return None
 
 def main(wf):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('query', nargs='?', default=None)
-    args = parser.parse_args(wf.args)
-
-    if not args.query:
+    # Get query from user
+    query = wf.args[0] if wf.args else None
+    
+    if not query:
         wf.add_item('Start typing to search Amazon...',
                    'Your search will be processed with associate tag',
                    icon='icon.png')
     else:
         try:
             # Create cache key from query
-            cache_key = f'search_{args.query}'
+            cache_key = f'search_{query}'
             
             # Try to get results from cache
-            results = wf.cached_data(cache_key, lambda: amazon.get_search_results(wf, args.query), max_age=CACHE_AGE)
+            # results = wf.cached_data(cache_key, lambda: amazon.get_search_results(wf, query), max_age=CACHE_AGE)
+            results = amazon.get_search_results(wf, query)
             
             if not results:
                 wf.add_item('No results found',
@@ -57,11 +61,48 @@ def main(wf):
                 
                 subtitle_parts = []
                 
-                # Price with 💰 emoji
-                if item.get('price'):
+                # Add sponsored status if applicable
+                if item.get('sponsored'):
+                    subtitle_parts.append("📢 Sponsored")
+                
+                # Calculate effective price if coupon is available
+                effective_price = None
+                if item.get('price') and item.get('coupon'):
+                    try:
+                        price = float(item['price'].replace('$', '').replace(',', ''))
+                        coupon = item['coupon'].strip()
+                        log.debug(f"Processing coupon: '{coupon}' for price: ${price}")
+                        
+                        # Clean up coupon text
+                        coupon = coupon.lower()
+                        coupon = coupon.replace('with coupon', '').strip()
+                        coupon = coupon.replace('off', '').strip()
+                        coupon = coupon.replace('discount', '').strip()
+                        
+                        # Handle percentage discount
+                        if '%' in coupon:
+                            percent = float(coupon.replace('%', '').strip())
+                            effective_price = price * (1 - percent/100)
+                            log.debug(f"Percentage discount: {percent}% -> ${effective_price}")
+                        # Handle absolute dollar discount
+                        elif '$' in coupon:
+                            discount = float(coupon.replace('$', '').strip())
+                            effective_price = price - discount
+                            log.debug(f"Dollar discount: ${discount} -> ${effective_price}")
+                        
+                        if effective_price and effective_price > 0:
+                            effective_price = f"${effective_price:.2f}"
+                            log.debug(f"Final effective price: {effective_price}")
+                    except ValueError as e:
+                        log.error(f"Error calculating effective price: {e}")
+                        log.error(f"Price: {item['price']}, Coupon: {item['coupon']}")
+                        effective_price = None
+                
+                # Price with 💰 emoji (show effective price if available)
+                if effective_price:
+                    subtitle_parts.append(f"🏷️ {effective_price}")
+                elif item.get('price'):
                     subtitle_parts.append(f"💰 {item['price']}")
-                if item.get('coupon'):
-                    subtitle_parts.append(f"🏷️ {item['coupon']}")
                 
                 # Reviews with ⭐ emoji
                 if item.get('stars'):
