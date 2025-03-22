@@ -16,7 +16,7 @@ A powerful Alfred workflow for searching Amazon products with smart filtering an
 
 ## Usage
 
-1. Type `amazon` followed by your search query
+1. Type `az` followed by your search query
 2. Optional parameters:
    - `srt:r` - Sort by rating (highest first)
    - `srt:ra` - Sort by rating (lowest first)
@@ -29,12 +29,12 @@ A powerful Alfred workflow for searching Amazon products with smart filtering an
 
 ### Examples
 
-- `amazon laptop` - Basic search
-- `amazon headphones srt:r` - Search headphones, sorted by rating
-- `amazon monitor srt:p` - Search monitors, sorted by price (lowest first)
-- `amazon keyboard dl:1` - Search keyboards available for delivery tomorrow or less
-- `amazon mouse dl:0 srt:p` - Search mice available for delivery today, sorted by price
-- `amazon tablet srt:r dl:2` - Search tablets available in 2 days or less, sorted by rating
+- `az laptop` - Basic search
+- `az headphones srt:r` - Search headphones, sorted by rating
+- `az monitor srt:p` - Search monitors, sorted by price (lowest first)
+- `az keyboard dl:1` - Search keyboards available for delivery tomorrow or less
+- `az mouse dl:0 srt:p` - Search mice available for delivery today, sorted by price
+- `az tablet srt:r dl:2` - Search tablets available in 2 days or less, sorted by rating
 
 ### Smart Caching
 
