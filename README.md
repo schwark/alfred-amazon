@@ -6,6 +6,10 @@ A powerful Alfred workflow for searching Amazon products with smart filtering an
 
 - 🔍 Fast Amazon product search
 - 💰 Price and coupon display
+  - Regular prices shown with 💰
+  - Coupon discounts shown with 🏷️
+  - Supports both percentage and dollar amount discounts
+  - Automatically calculates final price after discounts
 - ⭐ Rating and review count display
 - 📦 Delivery time information
 - 🖼️ Product images in results
