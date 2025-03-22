@@ -23,6 +23,8 @@ A powerful Alfred workflow for searching Amazon products with smart filtering an
 1. Type `az` followed by your search query
 2. Optional parameters:
    - `srt:r` - Sort by rating (highest first)
+     - Calculates score as rating × number of reviews
+     - Example: 4.5 stars with 1000 reviews = 4500 points
    - `srt:ra` - Sort by rating (lowest first)
    - `srt:p` - Sort by price (lowest first)
    - `srt:pd` - Sort by price (highest first)
