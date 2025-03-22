@@ -4,7 +4,7 @@
 """Amazon Search
 
 Usage:
-    amazon.py <query>
+    amazon.py <query> [srt:<sort>]
 """
 
 import sys
@@ -13,6 +13,36 @@ from workflow import Workflow, ICON_WEB, web
 import amazon
 
 CACHE_AGE = 1800  # 30 minutes
+
+def parse_sort_param(query):
+    """Parse sort parameter from query string."""
+    if 'srt:' not in query:
+        return query, None, None
+        
+    # Split query and sort parameter
+    parts = query.split('srt:', 1)
+    search_query = parts[0].strip()
+    sort_param = parts[1].strip().lower()
+    
+    # Parse sort parameter
+    if not sort_param:
+        return search_query, None, None
+        
+    # Get first character (r or p)
+    key = sort_param[0]
+    if key not in ('r', 'p'):
+        return search_query, None, None
+        
+    # Get direction if present
+    direction = sort_param[1] if len(sort_param) > 1 else None
+    if direction and direction not in ('a', 'd'):
+        direction = None
+        
+    # Set defaults if direction not specified
+    if not direction:
+        direction = 'd' if key == 'r' else 'a'
+        
+    return search_query, ('rating' if key == 'r' else 'price'), (direction == 'd')
 
 def download_image(url, asin):
     """Download an image from URL and save it to a temporary file using ASIN as filename."""
@@ -43,17 +73,35 @@ def main(wf):
                    icon='icon.png')
     else:
         try:
+            # Parse query and sort parameter
+            search_query, sort_key, sort_reverse = parse_sort_param(query)
+            
             # Create cache key from query
-            cache_key = f'search_{query}'
+            cache_key = f'search_{search_query}'
             
             # Try to get results from cache
-            # results = wf.cached_data(cache_key, lambda: amazon.get_search_results(wf, query), max_age=CACHE_AGE)
-            results = amazon.get_search_results(wf, query)
+            # results = wf.cached_data(cache_key, lambda: amazon.get_search_results(wf, search_query), max_age=CACHE_AGE)
+            results = amazon.get_search_results(wf, search_query)
             
             if not results:
                 wf.add_item('No results found',
                            'Try a different search term',
                            icon=ICON_WEB)
+            
+            # Sort results if sort parameter was provided
+            if sort_key:
+                if sort_key == 'rating':
+                    # Calculate rating score (stars * number of reviews)
+                    for item in results:
+                        try:
+                            stars = float(item.get('stars', '0').split()[0])
+                            reviews = int(item.get('reviews', '0').replace(',', ''))
+                            item['rating_score'] = stars * reviews
+                        except (ValueError, IndexError):
+                            item['rating_score'] = 0
+                    results.sort(key=lambda x: x.get('rating_score', 0), reverse=sort_reverse)
+                else:  # price
+                    results.sort(key=lambda x: float(x.get('price', '0').replace('$', '').replace(',', '')), reverse=sort_reverse)
             
             for item in results:
                 # Shorten the title intelligently

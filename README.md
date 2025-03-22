@@ -14,11 +14,23 @@ A simple Alfred workflow to search Amazon products directly from Alfred.
 - 📦 Shows delivery information
 - 🖼️ Product images as icons
 - 🔗 Amazon affiliate links (using tag: dillz-20)
+- 🔄 Sort results by rating or price
 
 ## Usage
 
 1. Type `az` followed by your search query
-2. Press Enter to open the selected product in your browser
+2. Optionally add `srt:` followed by:
+   - `r` to sort by rating (default: descending by rating × reviews)
+   - `p` to sort by price (default: ascending)
+   - Add `a` after `r` or `p` for ascending order
+   - Add `d` after `r` or `p` for descending order
+3. Press Enter to open the selected product in your browser
+
+Examples:
+- `az macbook srt:r` - Sort by rating (descending)
+- `az macbook srt:ra` - Sort by rating (ascending)
+- `az macbook srt:p` - Sort by price (ascending)
+- `az macbook srt:pd` - Sort by price (descending)
 
 ## Example Results
 
